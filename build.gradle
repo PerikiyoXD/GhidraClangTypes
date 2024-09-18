@@ -63,32 +63,30 @@ dependencies {
 buildExtension.enabled = false
 defaultTasks 'createDistribution'
 
-task createDistribution (type: Zip) {
-	baseName "${project.name}-${project.version}-${getGitHash()}-Ghidra_${ghidra_version}".replace(' ', '_')
-	extension 'zip'
-	destinationDir DISTRIBUTION_DIR
-	version ''
+task createDistribution(type: Zip) {
+	archiveBaseName.set("${project.name}-${project.version}-${getGitHash()}-Ghidra_${ghidra_version}".replace(' ', '_'))
+	archiveExtension.set('zip')
+	destinationDirectory.set(DISTRIBUTION_DIR)
+	version = ''
 
-	// Make sure that we don't try to copy the same file with the same path into the
-	// zip (this can happen!)
-	duplicatesStrategy 'exclude'
+	// Make sure that we don't try to copy the same file with the same path into the zip (this can happen!)
+	duplicatesStrategy = 'exclude'
 
-	// This filtered property file copy must appear before the general
-	// copy to ensure that it is prefered over the unmodified file
+	// This filtered property file copy must appear before the general copy to ensure that it is preferred over the unmodified file
 	File propFile = new File(project.projectDir, "extension.properties")
-	from (propFile) {
+	from(propFile) {
 		String version = "${ghidra_version}"
 		String name = "${project.name}"
-		filter (ReplaceTokens, tokens: [extversion: version])
-		filter (ReplaceTokens, tokens: [extname: name])
-		into PATH_IN_ZIP
+		filter(ReplaceTokens, tokens: [extversion: version])
+		filter(ReplaceTokens, tokens: [extname: name])
+		into(PATH_IN_ZIP)
 	}
 
-	from (project.jar) {
-		into PATH_IN_ZIP + "/lib"
+	from(project.jar) {
+		into(PATH_IN_ZIP + "/lib")
 	}
 
-	from (project.projectDir) {
+	from(project.projectDir) {
 		exclude 'build/**'
 		exclude '*.gradle'
 		exclude 'gradle.properties'
@@ -107,10 +105,10 @@ task createDistribution (type: Zip) {
 		exclude '.antProperties.xml'
 		exclude 'eclipse/**'
 
-		into PATH_IN_ZIP
+		into(PATH_IN_ZIP)
 	}
 
 	doLast {
-		println "\nCreated " + baseName + "." + extension + " in " + destinationDir
+		println "\nCreated " + archiveBaseName.get() + "." + archiveExtension.get() + " in " + destinationDirectory.get()
 	}
 }
